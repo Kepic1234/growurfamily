@@ -1,11 +1,9 @@
-
 repeat task.wait() until game:IsLoaded()
 
 local Players = game.Players.LocalPlayer
 local TeleportService = game:GetService("TeleportService")
-local teleport = false
 
--- pet list
+
 local acceptedPets = getgenv().AcceptedPets or {
     ["Bunny"] = true,
     ["Turtle"] = true,
@@ -13,7 +11,6 @@ local acceptedPets = getgenv().AcceptedPets or {
     ["Disco Bee"] = true,
     ["Butterfly"] = true
 }
-
 
 local function waitForuFarm()
     local farm
@@ -31,7 +28,8 @@ local function waitForuFarm()
 end
 
 
-local function getPetUUID()
+local function getAllPetUUIDs()
+    local uuids = {}
     local farm = waitForuFarm()
     local important = farm:WaitForChild("Important")
     local physical = important:WaitForChild("Objects_Physical")
@@ -41,40 +39,47 @@ local function getPetUUID()
             local timeToHatch = obj:GetAttribute("TimeToHatch")
             local uuid = obj:GetAttribute("OBJECT_UUID")
             if timeToHatch == 0 and uuid then
-                return uuid
+                table.insert(uuids, uuid)
             end
         end
     end
+
+    return uuids
 end
 
 
-local uuid
+local uuids
 repeat
-    uuid = getPetUUID()
+    uuids = getAllPetUUIDs()
     task.wait()
-until uuid
+until #uuids > 0
+
+
+local foundGoodPet = false
 
 task.wait(5)
-for _, v in next, getgc(true) do 
-    if type(v) == "table" then
-        local petData = rawget(v, uuid)
-        if petData and petData.Data and petData.Data.Type then
-            local name = petData.Data.Type
-            print("Nom du pet :", name)
+for _, uuid in ipairs(uuids) do
+    for _, v in next, getgc(true) do 
+        if type(v) == "table" then
+            local petData = rawget(v, uuid)
+            if petData and petData.Data and petData.Data.Type then
+                local name = petData.Data.Type
+                print("Pet trouvé :", name)
 
-            if acceptedPets[name] then
-                teleport = true
-                break
+                if acceptedPets[name] then
+                    foundGoodPet = true
+                    break
+                end
             end
         end
     end
+    if foundGoodPet then break end
 end
 
-
-if not teleport then
-    print("bad pet. teleport...")
+if not foundGoodPet then
+    print("BAD PET. TELEPORT...")
     queue_on_teleport(game:HttpGet("https://raw.githubusercontent.com/Kepic1234/growurfamily/refs/heads/main/v1"))
     TeleportService:Teleport(126884695634066, Players)
 else
-    print("PetList Found.")
+    print("PETLIST FOUND")
 end
