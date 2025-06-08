@@ -86,8 +86,8 @@ if not foundGoodPet then
     queue_on_teleport(game:HttpGet("https://raw.githubusercontent.com/Kepic1234/growurfamily/refs/heads/main/v1"))
 
     
-    if Players and Players.LocalPlayer then
-        TeleportService:Teleport(126884695634066, {Players.LocalPlayer})
+    if Players then
+        TeleportService:Teleport(126884695634066, Players)
     else
         warn("Players.LocalPlayer is not defined")
     end
