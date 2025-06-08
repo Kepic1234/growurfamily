@@ -1,11 +1,10 @@
-repeat task.wait() until uFarm() and petUUID()
-
+repeat task.wait() until game:IsLoaded()
 
 local Players = game.Players.LocalPlayer
 local TeleportService = game:GetService("TeleportService")
 local teleport = false
 
---pets list
+-- Pets list
 local acceptedPets = {
     ["Bunny"] = true,
     ["Turtle"] = true,
@@ -30,6 +29,7 @@ function petUUID()
     end
 end
 
+repeat task.wait() until uFarm() and petUUID()
 local uuid = petUUID()
 if not uuid then
     warn("UUID introuvable")
@@ -44,6 +44,7 @@ for i, v in next, getgc(true) do
             print("Nom du pet :", Name)
 
             if acceptedPets[Name] then
+                print("Bon pet détecté.")
                 teleport = true
                 break
             end
@@ -52,6 +53,10 @@ for i, v in next, getgc(true) do
 end
 
 if not teleport then
+    print("bad pet, teleport...")
     queue_on_teleport(game:HttpGet("https://raw.githubusercontent.com/Kepic1234/growurfamily/refs/heads/main/v1"))
     TeleportService:Teleport(126884695634066, Players)
+else
+    print("no tp pet in ur list found")
 end
+
