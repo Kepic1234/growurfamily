@@ -1,11 +1,12 @@
+
 repeat task.wait() until game:IsLoaded()
-workspace.Farm:WaitForChild("Important")
+
 local Players = game.Players.LocalPlayer
 local TeleportService = game:GetService("TeleportService")
 local teleport = false
 
--- Pets list
-local acceptedPets = {
+-- pet list
+local acceptedPets = getgenv().AcceptedPets or {
     ["Bunny"] = true,
     ["Turtle"] = true,
     ["Dragonfly"] = true,
@@ -13,38 +14,55 @@ local acceptedPets = {
     ["Butterfly"] = true
 }
 
-function uFarm()
-    for _, uFarm in next, workspace.Farm:GetChildren() do 
-        if uFarm.Sign:GetAttributes()._owner == Players.Name then
-            return uFarm
-        end    
-    end
+
+local function waitForuFarm()
+    local farm
+    repeat
+        task.wait()
+        for _, u in pairs(workspace:WaitForChild("Farm"):GetChildren()) do
+            local sign = u:FindFirstChild("Sign")
+            if sign and sign:GetAttribute("_owner") == Players.Name then
+                farm = u
+                break
+            end
+        end
+    until farm
+    return farm
 end
 
-function petUUID()
-    for _, UUID in next, uFarm().Important.Objects_Physical:GetChildren() do
-        if UUID:IsA("Model") and UUID.Name == "PetEgg" and UUID:GetAttributes().TimeToHatch == 0 then
-            return UUID:GetAttributes().OBJECT_UUID
+
+local function getPetUUID()
+    local farm = waitForuFarm()
+    local important = farm:WaitForChild("Important")
+    local physical = important:WaitForChild("Objects_Physical")
+
+    for _, obj in ipairs(physical:GetChildren()) do
+        if obj:IsA("Model") and obj.Name == "PetEgg" then
+            local timeToHatch = obj:GetAttribute("TimeToHatch")
+            local uuid = obj:GetAttribute("OBJECT_UUID")
+            if timeToHatch == 0 and uuid then
+                return uuid
+            end
         end
     end
 end
 
-repeat task.wait() until uFarm() and petUUID()
-local uuid = petUUID()
-if not uuid then
-    warn("UUID introuvable")
-    return
-end
 
-for i, v in next, getgc(true) do 
+local uuid
+repeat
+    uuid = getPetUUID()
+    task.wait()
+until uuid
+
+
+for _, v in next, getgc(true) do 
     if type(v) == "table" then
         local petData = rawget(v, uuid)
         if petData and petData.Data and petData.Data.Type then
-            local Name = petData.Data.Type
-            print("Nom du pet :", Name)
+            local name = petData.Data.Type
+            print("Nom du pet :", name)
 
-            if acceptedPets[Name] then
-                print("Bon pet détecté.")
+            if acceptedPets[name] then
                 teleport = true
                 break
             end
@@ -52,11 +70,11 @@ for i, v in next, getgc(true) do
     end
 end
 
+
 if not teleport then
-    print("bad pet, teleport...")
+    print("bad pet. teleport...")
     queue_on_teleport(game:HttpGet("https://raw.githubusercontent.com/Kepic1234/growurfamily/refs/heads/main/v1"))
     TeleportService:Teleport(126884695634066, Players)
 else
-    print("no tp pet in ur list found")
+    print("PetList Found.")
 end
-
