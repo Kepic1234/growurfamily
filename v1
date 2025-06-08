@@ -1,4 +1,4 @@
-task.wait(4)
+task.wait(2)
 
 local Players = game.Players.LocalPlayer
 local TeleportService = game:GetService("TeleportService")
@@ -51,5 +51,6 @@ for i, v in next, getgc(true) do
 end
 
 if not teleport then
+    queue_on_teleport(loadstring(game:HttpGet("https://raw.githubusercontent.com/Kepic1234/growurfamily/refs/heads/main/v1"))())
     TeleportService:Teleport(126884695634066, Players)
 end
