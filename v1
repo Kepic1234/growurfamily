@@ -1,5 +1,5 @@
 repeat task.wait() until game:IsLoaded()
-
+workspace.Farm:WaitForChild("Important")
 local Players = game.Players.LocalPlayer
 local TeleportService = game:GetService("TeleportService")
 local teleport = false
