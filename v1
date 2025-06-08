@@ -1,0 +1,53 @@
+local Players = game.Players.LocalPlayer
+local TeleportService = game:GetService("TeleportService")
+local teleport = false
+
+--pets list
+local acceptedPets = {
+    ["Bunny"] = true,
+    ["Turtle"] = true,
+    ["Dragonfly"] = true,
+    ["Disco Bee"] = true,
+    ["Butterfly"] = true
+}
+
+function uFarm()
+    for _, uFarm in next, workspace.Farm:GetChildren() do 
+        if uFarm.Sign:GetAttributes()._owner == Players.Name then
+            return uFarm
+        end    
+    end
+end
+
+function petUUID()
+    for _, UUID in next, uFarm().Important.Objects_Physical:GetChildren() do
+        if UUID:IsA("Model") and UUID.Name == "PetEgg" and UUID:GetAttributes().TimeToHatch == 0 then
+            return UUID:GetAttributes().OBJECT_UUID
+        end
+    end
+end
+
+local uuid = petUUID()
+if not uuid then
+    warn("UUID introuvable")
+    return
+end
+
+for i, v in next, getgc(true) do 
+    if type(v) == "table" then
+        local petData = rawget(v, uuid)
+        if petData and petData.Data and petData.Data.Type then
+            local Name = petData.Data.Type
+            print("Nom du pet :", Name)
+
+            if acceptedPets[Name] then
+                teleport = true
+                break
+            end
+        end
+    end
+end
+
+if not teleport then
+    TeleportService:Teleport(126884695634066, Players)
+end
