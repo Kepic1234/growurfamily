@@ -56,7 +56,7 @@ until #uuids > 0
 
 local foundGoodPet = false
 
-task.wait(7)
+task.wait(10)
 for _, uuid in ipairs(uuids) do
     if typeof(uuid) == "string" or typeof(uuid) == "number" then
         for _, v in next, getgc(true) do 
