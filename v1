@@ -12,6 +12,7 @@ local acceptedPets = getgenv().AcceptedPets or {
     ["Butterfly"] = true
 }
 
+
 local function waitForuFarm()
     local farm
     repeat
@@ -47,37 +48,41 @@ local function getAllPetUUIDs()
     return uuids
 end
 
-
 local uuids
 repeat
     uuids = getAllPetUUIDs()
     task.wait()
 until #uuids > 0
 
-
 local foundGoodPet = false
 
 task.wait(5)
 for _, uuid in ipairs(uuids) do
-    for _, v in next, getgc(true) do 
-        if type(v) == "table" then
-            local petData = rawget(v, uuid)
-            if petData and petData.Data and petData.Data.Type then
-                local name = petData.Data.Type
-                print("Pet trouvé :", name)
+    if typeof(uuid) == "string" or typeof(uuid) == "number" then
+        for _, v in next, getgc(true) do 
+            if type(v) == "table" then
+                local success, petData = pcall(function()
+                    return rawget(v, uuid)
+                end)
 
-                if acceptedPets[name] then
-                    foundGoodPet = true
-                    break
+                if success and petData and typeof(petData) == "table" and petData.Data and petData.Data.Type then
+                    local name = petData.Data.Type
+                    print("Pet trouvé :", name)
+
+                    if acceptedPets[name] then
+                        foundGoodPet = true
+                        break
+                    end
                 end
             end
         end
+        if foundGoodPet then break end
     end
-    if foundGoodPet then break end
 end
 
+
 if not foundGoodPet then
-    print("BAD PET. TELEPORT...")
+    print("BAD PET teleport...")
     queue_on_teleport(game:HttpGet("https://raw.githubusercontent.com/Kepic1234/growurfamily/refs/heads/main/v1"))
     TeleportService:Teleport(126884695634066, Players)
 else
