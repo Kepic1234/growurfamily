@@ -73,7 +73,7 @@ for _, uuid in ipairs(uuids) do
     if foundGoodPet then break end
 end
 
--
+
 local function sendWebhook(petName)
     if not requestFunction then
         warn("Executor does not support request().")
