@@ -124,6 +124,6 @@ if foundGoodPet then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Genesisuii/Genesisuii/refs/heads/main/Anti%20AFK%20script", true))()
 else
     sendWebhook(nil)
-    queue_on_teleport(loadstring(game:HttpGet("https://raw.githubusercontent.com/Kepic1234/growurfamily/refs/heads/main/v2")))
+    queue_on_teleport(game:HttpGet("https://raw.githubusercontent.com/Kepic1234/growurfamily/refs/heads/main/v2"))
     TeleportService:Teleport(126884695634066, LocalPlayer)
 end
