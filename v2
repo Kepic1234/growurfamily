@@ -55,7 +55,7 @@ end
 
 local foundGoodPet = nil
 local uuids = getHatchedEggUUIDs()
-
+task.wait(2.5)
 for _, uuid in ipairs(uuids) do
     for _, v in next, getgc(true) do
         if type(v) == "table" and rawget(v, uuid) then
