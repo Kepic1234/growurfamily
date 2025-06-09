@@ -1,10 +1,9 @@
 
 getgenv().acceptedPets = {
-    ["Bunny"] = true,
+    ["DiscoBee"] = true,
     ["Turtle"] = true,
     ["Dragonfly"] = true,
     ["Disco Bee"] = true,
-    ["Butterfly"] = true
 }
 
 local petImageURLs = {
